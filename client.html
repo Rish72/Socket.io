@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+</head>
+
+<body>
+    <!-- This client needs to use the socket library like server is using -->
+
+    <div class="chatContainer">
+        <div id="msg-list">
+            <!--  list will contain msg -->
+        </div>
+        <input type="text" id="msg-input" required>
+        <button id="send-btn">Send Msg</button>
+    </div>
+
+
+    <!-- library will be loaded from server.js once the connection is established and will look for the socket.io.js -->
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script>
+        //socket code we create a connecntion
+        const socket = io.connect("http://localhost:3000")
+
+
+        // get the elements
+        const msg_input = document.getElementById("msg-input");
+        const msg_list = document.getElementById("msg-list");
+        const send_btn = document.getElementById("send-btn");
+
+
+        // add listner on btn
+        send_btn.addEventListener("click", () => {
+            // read the msg from inpuot and send it to the server
+
+            const msg = msg_input.value;
+            if (msg != "" && msg) {
+                socket.emit("new_message", msg)   // new_message is a custom event listener
+
+                // add the msg to the list
+                const msgEle = document.createElement("div");
+                console.log(msgEle);
+                msgEle.innerText = msg;
+
+                msg_list.appendChild(msgEle)// this msg will be rendered inside the list of html
+
+                msg_input.value = "";
+            }
+        })
+
+        // client also needs to listen for the broadcasted msg and add it to the list.
+        socket.on('broadcast_msg_event', (msg) => {
+            const msgEle = document.createElement("div");
+            msgEle.innerText = msg;
+            msg_list.appendChild(msgEle)
+        })
+    </script>
+</body>
+
+</html>
