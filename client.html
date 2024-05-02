@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat App</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -25,9 +26,15 @@
         //socket code we create a connecntion
         const socket = io.connect("http://localhost:3000")
 
+        const userName = prompt("Enter Your name");
+
+        // emit the username to the server
+        socket.emit("userEntered_event", userName);
+
 
         // get the elements
         const msg_input = document.getElementById("msg-input");
+        msg_input.focus();
         const msg_list = document.getElementById("msg-list");
         const send_btn = document.getElementById("send-btn");
 
@@ -39,10 +46,10 @@
             const msg = msg_input.value;
             if (msg != "" && msg) {
                 socket.emit("new_message", msg)   // new_message is a custom event listener
-
+                console.log(msg);
                 // add the msg to the list
                 const msgEle = document.createElement("div");
-                console.log(msgEle);
+                // console.log(msgEle);
                 msgEle.innerText = msg;
 
                 msg_list.appendChild(msgEle)// this msg will be rendered inside the list of html
@@ -52,9 +59,10 @@
         })
 
         // client also needs to listen for the broadcasted msg and add it to the list.
-        socket.on('broadcast_msg_event', (msg) => {
+        socket.on('broadcast_msg_event', (userMsg) => {
+            console.log(userMsg);
             const msgEle = document.createElement("div");
-            msgEle.innerText = msg;
+            msgEle.innerText = userMsg.userName + " : " + userMsg.msg;
             msg_list.appendChild(msgEle)
         })
     </script>

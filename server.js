@@ -27,9 +27,17 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
     console.log("Connection is established");
 
+    socket.on("userEntered_event", (name) => {
+        socket.username = name;
+    })
     socket.on('new_message', (msg) => {
+
+        let userMsg = {
+            userName : socket.username,
+            msg : msg
+        }
         // as soon as we listen for new_message event we broadcast this msg to all the clients
-        socket.broadcast.emit('broadcast_msg_event', msg) // first the client was broadcasting the new_msg event now the server is broadcasting to all the clients
+        socket.broadcast.emit('broadcast_msg_event', userMsg) // first the client was broadcasting the new_msg event now the server is broadcasting to all the clients
     })
     socket.on("disconnect", () => {
         console.log("Disconnected");
